@@ -8,3 +8,7 @@ dist/
 coverage/
 .vscode/
 .idea/
+
+
+scripts/
+
