@@ -397,25 +397,25 @@ const Admin = () => {
         setDeleteModal({ open: false, id: null });
     };
 
-    // --- MASTER MIGRATION SCRIPT (Migrates all 5 tables) ---
+    // Migrates all 5 tables
     const migrateAllTables = async () => {
         if (!window.confirm("Ready to migrate all images across Events, Articles, YouTube, Workshops, and Team tables to Cloudinary?")) return;
         setLoading(true);
 
         const tablesToMigrate = [
-            { name: 'events', column: 'image_url' },
-            { name: 'articles', column: 'image_url' },
-            { name: 'youtube_videos', column: 'thumbnail_url' },
-            { name: 'workshops', column: 'image_url' },
-            { name: 'team', column: 'image_url' }
+            { name: 'events',         column: 'image_url',     fetchFn: getEvents,        updateFn: updateEvent },
+            { name: 'articles',       column: 'image_url',     fetchFn: getArticle,       updateFn: updateArticle },
+            { name: 'youtube_videos', column: 'thumbnail_url', fetchFn: getYoutubeVideos, updateFn: updateYoutubeVideo },
+            { name: 'workshops',      column: 'image_url',     fetchFn: getWorkshops,     updateFn: updateWorkshop },
+            { name: 'team',           column: 'image_url',     fetchFn: getTeam,          updateFn: updateMember },
         ];
 
         let totalMigrated = 0;
 
         try {
             for (const table of tablesToMigrate) {
-                const { data: rows } = await supabase.from(table.name).select('*');
-                if (!rows) continue;
+                const rows = await table.fetchFn();
+                if (!rows || rows.error) continue;
 
                 for (let i = 0; i < rows.length; i++) {
                     const item = rows[i];
@@ -429,10 +429,10 @@ const Admin = () => {
 
                         const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
                         const cData = await res.json();
-                        
+
                         if (cData.secure_url) {
                             const newUrl = cData.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
-                            await supabase.from(table.name).update({ [table.column]: newUrl }).eq('id', item.id);
+                            await table.updateFn(item.id, { [table.column]: newUrl });
                             totalMigrated++;
                         }
                     }
