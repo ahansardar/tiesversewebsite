@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback, memo } from 'react';
-import { supabase } from '../supabaseClient';
+import { getEvents, getYoutubeVideos, getWorkshops, getSettings } from '../apiClient';
 import '../styles/Events.css';
 
 // Asset imports
@@ -415,14 +415,14 @@ const Events = () => {
             setLoading(true);
             try {
                 const [settingsRes, eventsRes, youtubeRes, workshopsRes] = await Promise.all([
-                    supabase.from('site_settings').select('key, value'),
-                    supabase.from('events').select('*').order('created_at', { ascending: false }),
-                    supabase.from('youtube_videos').select('*').order('created_at', { ascending: false }),
-                    supabase.from('workshops').select('*').order('created_at', { ascending: false })
+                    getSettings(),
+                    getEvents(),
+                    getYoutubeVideos(),
+                    getWorkshops()
                 ]);
 
-                if (settingsRes.data) {
-                    const getS = (key, fallback) => settingsRes.data.find(s => s.key === key)?.value || fallback;
+                if (settingsRes && !settingsRes.error) {
+                    const getS = (key, fallback) => settingsRes.find(s => s.key === key)?.value || fallback;
                     setDisplayLimits({
                         pc: parseInt(getS('event_display_limit_pc', 2)),
                         mobile: parseInt(getS('event_display_limit_mobile', 1)),
@@ -432,10 +432,10 @@ const Events = () => {
                 }
 
                 setData({
-                    events: eventsRes.data?.map(e => ({ ...e, img: getFallback(e, 'event') })) || [],
-                    podcasts: youtubeRes.data?.map(p => ({ ...p, img: getFallback(p, 'podcast'), tag: p.category || 'STRATEGY' })) || [],
-                    virtual: workshopsRes.data?.filter(w => w.category === 'VIRTUAL').map(w => ({ ...w, img: getFallback(w, 'workshop'), tag: w.tag || 'VIRTUAL' })) || [],
-                    inPerson: workshopsRes.data?.filter(w => w.category === 'IN_PERSON').map(w => ({ ...w, img: getFallback(w, 'workshop'), tag: w.tag || 'FIELD' })) || []
+                    events: (eventsRes || []).map(e => ({ ...e, img: getFallback(e, 'event') })),
+                    podcasts: (youtubeRes || []).map(p => ({ ...p, img: getFallback(p, 'podcast'), tag: p.category || 'STRATEGY' })),
+                    virtual: (workshopsRes || []).filter(w => w.category === 'VIRTUAL').map(w => ({ ...w, img: getFallback(w, 'workshop'), tag: w.tag || 'VIRTUAL' })),
+                    inPerson: (workshopsRes || []).filter(w => w.category === 'IN_PERSON').map(w => ({ ...w, img: getFallback(w, 'workshop'), tag: w.tag || 'FIELD' }))
                 });
 
             } catch (err) {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '../supabaseClient';
+import { login } from '../apiClient';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Admin.css'; // Reusing admin styles for consistent theme
 
@@ -15,13 +15,10 @@ const Login = () => {
         setLoading(true);
         setError(null);
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        const data = await login(email, password);
 
-        if (error) {
-            setError(error.message);
+        if (data.error) {
+            setError(data.error);
         } else {
             navigate('/admin');
         }

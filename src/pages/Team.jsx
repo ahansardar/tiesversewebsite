@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { supabase } from '../supabaseClient';
+import { getTeam } from '../apiClient';
 
 const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&h=400&auto=format&fit=crop";
 
@@ -59,15 +59,12 @@ const Team = () => {
   useEffect(() => {
     const fetchTeam = async () => {
       try {
-        const { data, error } = await supabase
-          .from('team')
-          .select('*')
-          .order('created_at', { ascending: true });
-
-        if (error) throw error;
-        if (data) {
+        const data = await getTeam();
+        if (data && !data.error) {
           setTeamMembers(data);
           setStatus('success');
+        } else {
+          setStatus('error');
         }
       } catch (err) {
         console.error('Fetch error:', err);

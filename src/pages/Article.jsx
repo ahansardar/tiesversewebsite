@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import { getArticle, getSettings } from '../apiClient';
 
 // Asset imports for fallback/legacy mapping
 import act1 from '../assets/act1.jpeg';
@@ -46,26 +46,21 @@ const Article = () => {
       setLoading(true);
       try {
         // 1. Fetch Display Limits
-        const { data: sData } = await supabase.from('site_settings').select('key, value');
-        if (sData) {
+        const sData = await getSettings();
+        if (sData && !sData.error) {
           const pc = sData.find(s => s.key === 'article_display_limit_pc')?.value || 3;
           const mob = sData.find(s => s.key === 'article_display_limit_mobile')?.value || 3;
           setDisplayLimits({ pc: parseInt(pc), mobile: parseInt(mob) });
         }
 
         // 2. Fetch articles - NEWEST FIRST
-        const { data: artData, error } = await supabase
-          .from('articles')
-          .select('*')
-          .order('created_at', { ascending: false });
+        const artData = await getArticle();
 
-        if (error) throw error;
-
-        if (artData && artData.length > 0) {
+        if (artData && !artData.error && artData.length > 0) {
           const formatted = artData.map(a => ({
             ...a,
             img: getArticleImage(a),
-            cat: a.category // mapping for existing UI
+            cat: a.category
           }));
           setInsights(formatted);
           setActive(formatted[0]);

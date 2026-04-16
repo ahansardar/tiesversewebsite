@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import { getFeaturedEvent } from '../apiClient';
 import './AnnouncementBanner.css';
 
 const AnnouncementBanner = () => {
@@ -8,15 +8,8 @@ const AnnouncementBanner = () => {
 
     useEffect(() => {
         const fetchFeatured = async () => {
-            const { data, error } = await supabase
-                .from('events')
-                .select('*')
-                .eq('is_featured', true)
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .single();
-
-            if (data) setFeaturedEvent(data);
+            const data = await getFeaturedEvent();
+            if (data && !data.error) setFeaturedEvent(data);
         };
         fetchFeatured();
     }, []);

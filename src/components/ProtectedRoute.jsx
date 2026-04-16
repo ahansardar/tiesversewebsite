@@ -1,25 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+import { getSession } from '../apiClient';
 
 const ProtectedRoute = ({ children }) => {
     const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
+        const checkSession = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setSession(null);
+                setLoading(false);
+                return;
+            }
+            const data = await getSession();
+            if (data.valid) {
+                setSession(data.user);
+            } else {
+                localStorage.removeItem('token');
+                setSession(null);
+            }
             setLoading(false);
-        });
-
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            setLoading(false);
-        });
-
-        return () => subscription.unsubscribe();
+        };
+        checkSession();
     }, []);
 
     if (loading) {
@@ -29,7 +33,7 @@ const ProtectedRoute = ({ children }) => {
             justifyContent: 'center',
             alignItems: 'center',
             background: '#050505',
-            color: '#rgba(255,255,255,0.5)'
+            color: 'rgba(255,255,255,0.5)'
         }}>Authorization Check...</div>;
     }
 

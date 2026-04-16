@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import {
+    login, logout, getSession,
+    getEvents, createEvent, updateEvent, deleteEvent,
+    getArticle, createArticle, updateArticle, deleteArticle,
+    getYoutubeVideos, createYoutubeVideo, updateYoutubeVideo, deleteYoutubeVideo,
+    getWorkshops, createWorkshop, updateWorkshop, deleteWorkshop,
+    getTeam, createMember, updateMember, deleteMember,
+    getSettings, updateSetting
+} from '../apiClient';
 import '../styles/Admin.css';
 
 // Legacy assets for fallbacks
@@ -73,16 +81,13 @@ const Admin = () => {
     // --- AUTH EFFECT ---
     useEffect(() => {
         const checkUser = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setUser(session?.user ?? null);
+            const token = localStorage.getItem('token');
+            if (!token) { setUser(null); return; }
+            const data = await getSession();
+            setUser(data.valid ? data.user : null);
+            if (!data.valid) localStorage.removeItem('token');
         };
         checkUser();
-
-        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-            setUser(session?.user ?? null);
-        });
-
-        return () => authListener.subscription.unsubscribe();
     }, []);
 
     // --- HELPERS ---
@@ -139,33 +144,38 @@ const Admin = () => {
         setMobileMenuOpen(false);
     };
 
+    const fetchFnMap = {
+        events: getEvents,
+        articles: getArticle,
+        youtube_videos: getYoutubeVideos,
+        workshops: getWorkshops,
+        team: getTeam,
+    };
+
     const fetchData = async () => {
         setLoading(true);
         try {
-            const { data: sData } = await supabase.from('site_settings').select('*');
-            if (sData) {
-                    const settingsMap = {};
-                    sData.forEach(s => {
-                        settingsMap[s.key] = Number(s.value);
-                    });
-                    setSiteSettings(prev => ({ ...prev, ...settingsMap }));
-                }
+            const sData = await getSettings();
+            if (sData && !sData.error) {
+                const settingsMap = {};
+                sData.forEach(s => { settingsMap[s.key] = Number(s.value); });
+                setSiteSettings(prev => ({ ...prev, ...settingsMap }));
+            }
 
-            const { data, error } = await supabase
-                .from(activeTab)
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) console.error('Error fetching data:', error);
-            else setItems(data);
+            const fetchFn = fetchFnMap[activeTab];
+            if (fetchFn) {
+                const data = await fetchFn();
+                if (data && !data.error) setItems(data);
+                else console.error('Error fetching data');
+            }
 
             if (activeTab === 'workshops') {
-                const { data: eventsData } = await supabase.from('events').select('*').eq('status', 'EVENT ENDED');
-                if (eventsData) {
-                    const { data: existingWorkshops } = await supabase.from('workshops').select('event_id');
-                    const usedEventIds = new Set(existingWorkshops.map(w => w.event_id).filter(Boolean));
-                    const unassigned = eventsData.filter(e => !usedEventIds.has(e.id));
-                    setUnassignedEvents(unassigned);
+                const eventsData = await getEvents();
+                if (eventsData && !eventsData.error) {
+                    const endedEvents = eventsData.filter(e => e.status === 'EVENT ENDED');
+                    const workshopsData = await getWorkshops();
+                    const usedEventIds = new Set((workshopsData || []).map(w => w.event_id).filter(Boolean));
+                    setUnassignedEvents(endedEvents.filter(e => !usedEventIds.has(e.id)));
                 }
             }
         } catch (err) {
@@ -191,16 +201,19 @@ const Admin = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-            alert(error.message);
+        const data = await login(email, password);
+        if (data.error) {
+            alert(data.error);
             setLoading(false);
+        } else {
+            setUser(data.user);
         }
     };
 
-    const handleLogout = async () => { 
+    const handleLogout = async () => {
         setLoading(true);
-        await supabase.auth.signOut(); 
+        await logout();
+        setUser(null);
         setLoading(false);
     };
 
@@ -279,13 +292,8 @@ const Admin = () => {
 
         try {
             if (activeTab === 'events' && dataToSave.is_featured) {
-                const { data: existingFeatured } = await supabase
-                    .from('events')
-                    .select('id, title')
-                    .eq('is_featured', true)
-                    .neq('id', editingId || '00000000-0000-0000-0000-000000000000')
-                    .maybeSingle();
-
+                const allEvents = await getEvents();
+                const existingFeatured = (allEvents || []).find(e => e.is_featured && e.id !== editingId);
                 if (existingFeatured) {
                     setSwapModal({ open: true, existingId: existingFeatured.id, existingTitle: existingFeatured.title, dataToSave: dataToSave });
                     setLoading(false);
@@ -305,13 +313,16 @@ const Admin = () => {
 
             if (activeTab === 'events' && !dataToSave.status) dataToSave.status = 'REGISTRATION OPEN';
 
+            const updateFnMap = { events: updateEvent, articles: updateArticle, youtube_videos: updateYoutubeVideo, workshops: updateWorkshop, team: updateMember };
+            const createFnMap = { events: createEvent, articles: createArticle, youtube_videos: createYoutubeVideo, workshops: createWorkshop, team: createMember };
+
             if (editingId) {
-                const { error } = await supabase.from(activeTab).update(dataToSave).eq('id', editingId);
-                if (error) showNotice('Error updating: ' + error.message, 'error');
+                const res = await updateFnMap[activeTab](editingId, dataToSave);
+                if (res?.error) showNotice('Error updating: ' + res.error, 'error');
                 else { showNotice('Successfully updated!'); resetForm(); fetchData(); }
             } else {
-                const { error } = await supabase.from(activeTab).insert([dataToSave]);
-                if (error) showNotice('Error adding: ' + error.message, 'error');
+                const res = await createFnMap[activeTab](dataToSave);
+                if (res?.error) showNotice('Error adding: ' + res.error, 'error');
                 else { showNotice('Successfully published!'); resetForm(); fetchData(); }
             }
         } catch (err) {
@@ -324,7 +335,7 @@ const Admin = () => {
         setLoading(true);
         const { existingId, dataToSave } = swapModal;
         try {
-            await supabase.from('events').update({ is_featured: false }).eq('id', existingId);
+            await updateEvent(existingId, { is_featured: false });
 
             let finalData = { ...dataToSave };
             if (formData.imageFile) {
@@ -333,10 +344,10 @@ const Admin = () => {
             }
 
             if (editingId) {
-                await supabase.from('events').update(finalData).eq('id', editingId);
+                await updateEvent(editingId, finalData);
                 showNotice('Banners swapped successfully!');
             } else {
-                await supabase.from('events').insert([finalData]);
+                await createEvent(finalData);
                 showNotice('New banner is now live!');
             }
 
@@ -356,9 +367,9 @@ const Admin = () => {
         if (isNaN(numValue)) { showNotice('Please enter a valid number', 'error'); return; }
 
         setLoading(true);
-        const { error } = await supabase.from('site_settings').update({ value: numValue }).eq('key', key);
+        const res = await updateSetting(key, { value: String(numValue) });
 
-        if (error) { showNotice('Update failed: ' + error.message, 'error'); } 
+        if (res?.error) { showNotice('Update failed: ' + res.error, 'error'); }
         else { showNotice('Settings updated successfully!'); fetchData(); }
         setLoading(false);
     };
@@ -374,11 +385,12 @@ const Admin = () => {
     const handleDelete = async () => {
         const { id } = deleteModal;
         setLoading(true);
-        const { error } = await supabase.from(activeTab).delete().eq('id', id);
-        if (error) showNotice('Error deleting: ' + error.message, 'error');
+        const deleteFnMap = { events: deleteEvent, articles: deleteArticle, youtube_videos: deleteYoutubeVideo, workshops: deleteWorkshop, team: deleteMember };
+        const res = await deleteFnMap[activeTab](id);
+        if (res?.error) showNotice('Error deleting: ' + res.error, 'error');
         else {
             showNotice('Entry removed.');
-            if (id === editingId) resetForm(); 
+            if (id === editingId) resetForm();
             fetchData();
         }
         setLoading(false);
