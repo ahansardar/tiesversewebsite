@@ -6,7 +6,7 @@ const YoutubeVideoSchemas = new mongoose.Schema({
     thumbnail_url : {type : String},
     episode_id : {type : String},
     category : {type : String},
-}, {timestamp : true});
+}, {timestamps : true});
 
 module.exports = mongoose.model('YoutubeVideo', YoutubeVideoSchemas);
     

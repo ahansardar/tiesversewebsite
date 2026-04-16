@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const WorkshopSchema = new mongooseSchema({
+const WorkshopSchema = new mongoose.Schema({
     title : {type : String},
     date : {type : String},
     category : {type : String, enum: ['VIRTUAL','IN_PERSON']},
