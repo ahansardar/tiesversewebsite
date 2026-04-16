@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const {createClient} = require('@supabase/supabase-js');
+const authMiddleware = require('../middleware/auth');
 
 const supabase = createClient(process.env.SUPABASE_URL,
 process.env.SUPABASE_SERVICE_KEY);
 
 //GET all youtube_videos
-router.get('/', async (req,res)=>{
+router.get('/',authMiddleware, async (req,res)=>{
     const{data, error} = await supabase
         .from('youtube_videos')
         .select('*')
@@ -16,7 +17,7 @@ router.get('/', async (req,res)=>{
 });
 
 //POST all 
-router.post('/', async (req, res)=>{
+router.post('/',authMiddleware, async (req, res)=>{
     const {data, error} = await supabase
         .from('youtube_videos')
         .insert(req.body)
@@ -26,7 +27,7 @@ router.post('/', async (req, res)=>{
 });
 
 //PUT event
-router.put('/:id', async (req, res)=>{
+router.put('/:id',authMiddleware, async (req, res)=>{
     const{data, error} = await supabase
         .from('youtube_videos')
         .update(req.body)
@@ -36,7 +37,7 @@ router.put('/:id', async (req, res)=>{
 });
 
 //DELETE event
-router.delete('/:id', async (req, res)=>{
+router.delete('/:id',authMiddleware, async (req, res)=>{
     const {error} = await supabase
         .from('youtube_videos')
         .delete()

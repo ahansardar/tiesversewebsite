@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const {createClient} = require('@supabase/supabase-js');
-
+const authMiddleware = require('../middleware/auth');
 const supabase = createClient(process.env.SUPABASE_URL,
 process.env.SUPABASE_SERVICE_KEY);
 
 //GET all events
-router.get('/', async (req,res)=>{
+router.get('/', authMiddleware, async (req,res)=>{
     const{data, error} = await supabase
         .from('events')
         .select('*')
@@ -16,7 +16,7 @@ router.get('/', async (req,res)=>{
 });
 
 //GET featured events
-router.get('/featured', async (req, res) => {
+router.get('/featured',authMiddleware, async (req, res) => {
     const {data, error} = await supabase
         .from('events')
         .select('*')
@@ -29,7 +29,7 @@ router.get('/featured', async (req, res) => {
 });
 
 //POST create event (admin only)
-router.post('/', async (req, res)=>{
+router.post('/',authMiddleware, async (req, res)=>{
     const {data, error} = await supabase
         .from('events')
         .insert(req.body)
@@ -40,7 +40,7 @@ router.post('/', async (req, res)=>{
 
 
 //PUT event
-router.put('/:id', async (req, res)=>{
+router.put('/:id',authMiddleware, async (req, res)=>{
     const{data, error} = await supabase
         .from('events')
         .update(req.body)
@@ -51,7 +51,7 @@ router.put('/:id', async (req, res)=>{
 
 
 //DELETE event
-router.delete('/:id', async (req, res)=>{
+router.delete('/:id',authMiddleware, async (req, res)=>{
     const {error} = await supabase
         .from('events')
         .delete()

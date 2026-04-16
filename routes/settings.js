@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const {createClient} = require('@supabase/supabase-js');
-
+const authMiddleware = requirw('../middleware/auth');
 const supabase = createClient(process.env.SUPABASE_URL,
 process.env.SUPABASE_SERVICE_KEY);
 
 //GET all settings
-router.get('/', async (req,res)=>{
+router.get('/',authMiddleware, async (req,res)=>{
     const{data, error} = await supabase
         .from('site_settings')
         .select('*')
@@ -15,7 +15,7 @@ router.get('/', async (req,res)=>{
 });
 
 //PUT event
-router.put('/:key', async (req, res)=>{
+router.put('/:key',authMiddleware, async (req, res)=>{
     const{data, error} = await supabase
         .from('site_settings')
         .update(req.body)

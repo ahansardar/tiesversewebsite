@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const {createClient} = require('@supabase/supabase-js');
-
+const authMiddleware = require('../middleware/auth');
 const supabase = createClient(process.env.SUPABASE_URL,
 process.env.SUPABASE_SERVICE_KEY);
 
 //POST /login
-router.post('/login', async (req,res)=>{
+router.post('/login',authMiddleware,async (req,res)=>{
     const{email, password} = req.body;
 
     const{data, error} = await supabase.auth.signInWithPassword({
@@ -24,13 +24,13 @@ router.post('/login', async (req,res)=>{
 });
 
 //POST logout
-router.post('/logout', async(req, res)=>{
+router.post('/logout',authMiddleware, async(req, res)=>{
     await supabase.auth.signOut();
     res.json({message: 'Logged out Successfully'});
 });
 
 //GET /session
-router.get('/session', async(req, res)=>{
+router.get('/session',authMiddleware, async(req, res)=>{
     const authHeader = req.headers.authorization;
 
     if(!authHeader){
