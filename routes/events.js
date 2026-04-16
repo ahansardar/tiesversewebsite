@@ -21,7 +21,7 @@ router.get('/featured', async (req, res) => {
         .from('events')
         .select('*')
         .eq('is_featured', true)
-        .order('created_art', {ascending : false})
+        .order('created_at', {ascending : false})
         .limit(1)
         .single()
     if(error) return res.status(500).json({error: error.message});
@@ -29,13 +29,13 @@ router.get('/featured', async (req, res) => {
 });
 
 //POST create event (admin only)
-router.post('/:id', async (req, res)=>{
+router.post('/', async (req, res)=>{
     const {data, error} = await supabase
         .from('events')
         .insert(req.body)
         
     if(error) return res.status(500).json({error: error.message});
-    res.json(data);
+    res.status(200).json(data);
 });
 
 
@@ -46,7 +46,7 @@ router.put('/:id', async (req, res)=>{
         .update(req.body)
         .eq('id', req.params.id);
     if (error) return res.status(500).json({error: error.message});
-    res.join(data);
+    res.json(data);
 });
 
 
@@ -56,7 +56,7 @@ router.delete('/:id', async (req, res)=>{
         .from('events')
         .delete()
         .eq('id', req.params.id);
-    if(error) return res.status(500).json({erro: error.message});
+    if(error) return res.status(500).json({error: error.message});
     res.json("Deleted successfully");
 }); 
 
