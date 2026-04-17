@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { supabase } from '../supabaseClient';
+=======
+import { getArticle, getSettings } from '../apiClient';
+>>>>>>> node-krisjscott
 
 // Asset imports for fallback/legacy mapping
 import act1 from '../assets/act1.jpeg';
@@ -46,14 +50,20 @@ const Article = () => {
       setLoading(true);
       try {
         // 1. Fetch Display Limits
+<<<<<<< HEAD
         const { data: sData } = await supabase.from('site_settings').select('key, value');
         if (sData) {
+=======
+        const sData = await getSettings();
+        if (sData && !sData.error) {
+>>>>>>> node-krisjscott
           const pc = sData.find(s => s.key === 'article_display_limit_pc')?.value || 3;
           const mob = sData.find(s => s.key === 'article_display_limit_mobile')?.value || 3;
           setDisplayLimits({ pc: parseInt(pc), mobile: parseInt(mob) });
         }
 
         // 2. Fetch articles - NEWEST FIRST
+<<<<<<< HEAD
         const { data: artData, error } = await supabase
           .from('articles')
           .select('*')
@@ -66,6 +76,15 @@ const Article = () => {
             ...a,
             img: getArticleImage(a),
             cat: a.category // mapping for existing UI
+=======
+        const artData = await getArticle();
+
+        if (artData && !artData.error && artData.length > 0) {
+          const formatted = artData.map(a => ({
+            ...a,
+            img: getArticleImage(a),
+            cat: a.category
+>>>>>>> node-krisjscott
           }));
           setInsights(formatted);
           setActive(formatted[0]);

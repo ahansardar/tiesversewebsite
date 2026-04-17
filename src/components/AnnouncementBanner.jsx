@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { supabase } from '../supabaseClient';
+=======
+import { getFeaturedEvent } from '../apiClient';
+>>>>>>> node-krisjscott
 import './AnnouncementBanner.css';
 
 const AnnouncementBanner = () => {
@@ -8,6 +12,7 @@ const AnnouncementBanner = () => {
 
     useEffect(() => {
         const fetchFeatured = async () => {
+<<<<<<< HEAD
             const { data, error } = await supabase
                 .from('events')
                 .select('*')
@@ -17,6 +22,10 @@ const AnnouncementBanner = () => {
                 .single();
 
             if (data) setFeaturedEvent(data);
+=======
+            const data = await getFeaturedEvent();
+            if (data && !data.error) setFeaturedEvent(data);
+>>>>>>> node-krisjscott
         };
         fetchFeatured();
     }, []);
