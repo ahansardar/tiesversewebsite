@@ -7,7 +7,7 @@ const supabase = createClient(process.env.SUPABASE_URL,
 process.env.SUPABASE_SERVICE_KEY);
 
 //GET category = VIRTUAL
-router.get('/',authMiddleware, async (req, res) =>{
+router.get('/', async (req, res) =>{
     const {category} = req.query;
     let query = supabase
         .from('workshops')

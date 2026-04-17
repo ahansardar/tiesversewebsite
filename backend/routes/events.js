@@ -6,7 +6,7 @@ const supabase = createClient(process.env.SUPABASE_URL,
 process.env.SUPABASE_SERVICE_KEY);
 
 //GET all events
-router.get('/', authMiddleware, async (req,res)=>{
+router.get('/', async (req,res)=>{
     const{data, error} = await supabase
         .from('events')
         .select('*')
@@ -16,7 +16,7 @@ router.get('/', authMiddleware, async (req,res)=>{
 });
 
 //GET featured events
-router.get('/featured',authMiddleware, async (req, res) => {
+router.get('/featured', async (req, res) => {
     const {data, error} = await supabase
         .from('events')
         .select('*')
