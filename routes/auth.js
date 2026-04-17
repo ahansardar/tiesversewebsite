@@ -7,7 +7,7 @@ const supabase = createClient(process.env.SUPABASE_URL,
 process.env.SUPABASE_SERVICE_KEY);
 
 //POST /login
-router.post('/login',authMiddleware,async (req,res)=>{
+router.post('/login', async (req,res)=>{
     const{email, password} = req.body;
 
     const{data, error} = await supabase.auth.signInWithPassword({

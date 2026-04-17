@@ -7,7 +7,7 @@ const supabase = createClient(process.env.SUPABASE_URL,
 process.env.SUPABASE_SERVICE_KEY);
 
 //GET all youtube_videos
-router.get('/',authMiddleware, async (req,res)=>{
+router.get('/', async (req,res)=>{
     const{data, error} = await supabase
         .from('youtube_videos')
         .select('*')

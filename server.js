@@ -15,7 +15,7 @@ const settingsRoutes = require('./routes/settings');
 const teamRoutes = require('./routes/team');
 
 
-app.use(cors({origin : ['http://localhost:3000', 'https://tiesverse.com']}));
+app.use(cors({origin : ['http://localhost:3000', 'http://localhost:5173', 'https://tiesverse.com']}));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);                                                                                           

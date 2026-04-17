@@ -6,7 +6,7 @@ const supabase = createClient(process.env.SUPABASE_URL,
 process.env.SUPABASE_SERVICE_KEY);
 
 //GET all team_members
-router.get('/',authMiddleware, async (req,res)=>{
+router.get('/', async (req,res)=>{
     const{data, error} = await supabase
         .from('team_members')
         .select('*')
