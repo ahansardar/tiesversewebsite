@@ -6,6 +6,7 @@ const getToken = () => localStorage.getItem('token');
 
 const publicFetch = async (path) => {
     const res = await fetch(`${API_URL}${path}`);
+    if(!res.ok) return{error : res.statusText};
     return res.json();
 };
 

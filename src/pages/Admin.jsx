@@ -44,8 +44,8 @@ import nayoimg from '../assets/nayo.jpg';
 import smitiimg from '../assets/smiti.jpg';
 
 // --- CLOUDINARY CONFIGURATION ---
-const CLOUD_NAME = "dgmxkx5x8"; // Your new Cloudinary account!
-const UPLOAD_PRESET = "tiesverse_preset"; // 👉 CHANGE THIS to the preset you created
+const CLOUD_NAME = "dgmxkx5x8"; // 
+const UPLOAD_PRESET = "tiesverse_preset"; // 
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
 const Admin = () => {
