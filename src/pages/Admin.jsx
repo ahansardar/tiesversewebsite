@@ -348,6 +348,7 @@ const Admin = () => {
             }
 
             if (activeTab === 'events' && !dataToSave.status) dataToSave.status = 'REGISTRATION OPEN';
+            if (activeTab === 'workshops' && !dataToSave.category) dataToSave.category = 'VIRTUAL';
 
             const updateFnMap = { events: updateEvent, articles: updateArticle, youtube_videos: updateYoutubeVideo, workshops: updateWorkshop, team: updateMember };
             const createFnMap = { events: createEvent, articles: createArticle, youtube_videos: createYoutubeVideo, workshops: createWorkshop, team: createMember };

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback, memo } from '
 import { getEvents, getYoutubeVideos, getWorkshops, getSettings } from '../apiClient';
 import '../styles/Events.css';
 
-// Asset imports
+// Asset imports (DON'T TOUCH)
 import yt1 from '../assets/yt1.jpg';
 import yt2 from '../assets/yt2.jpg';
 import yt3 from '../assets/yt3.jpg';
@@ -11,7 +11,7 @@ import ws2 from '../assets/ws2.png';
 import ws3 from '../assets/ws3.png';
 import ws4 from '../assets/ws4.png';
 
-// Summit Assets
+// Summit Assets (DON'T TOUCH)
 import summit4 from '../assets/IMG_0390.jpg'; 
 import summit5 from '../assets/IMG_0057.jpg'; 
 import summit6 from '../assets/IMG_0043.jpg'; 
