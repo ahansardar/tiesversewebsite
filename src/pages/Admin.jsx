@@ -106,7 +106,7 @@ const Admin = () => {
         }
     };
 
-    // --- SELECT IMAGE FROM PICKER ---
+    // SELECT IMAGE FROM PICKER 
     const selectCloudinaryImage = (url) => {
         const fieldName = activeTab === 'youtube_videos' ? 'thumbnail_url' : 'image_url';
         setFormData(prev => ({ ...prev, [fieldName]: url, imageFile: null }));
