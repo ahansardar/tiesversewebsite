@@ -92,26 +92,23 @@ const Planet = React.memo(({ item, isActive, progress, index, total, viewport, g
   if (localProgress > -1.5 && localProgress < 1.5) {
     opacity = Math.max(0, Math.min(1, 1 - Math.abs(localProgress) * 0.7));
 
-    // SCALE: HERO FOCUS (Smoothly blend between idle and focus to avoid abrupt pop)
-    const inactiveScale = isMobile ? 0.62 : (isTablet ? 0.78 : 0.82);
-    const activeScale = isMobile ? 1.45 : 1.6;
+    // SCALE: HERO FOCUS (Adjusted for better mobile visibility)
+    const inactiveScale = isMobile ? 0.75 : (isTablet ? 0.78 : 0.82);
+    const activeScale = isMobile ? 1.6 : 1.6;
     const focus = Math.pow(Math.max(0, 1 - Math.abs(localProgress) * 0.95), 1.7);
     const baseScale = inactiveScale + (activeScale - inactiveScale) * focus;
-    // Fluidly scale planets with their container
+    
     const relativeSizeFactor = globeContainerSize / 650;
     scale = baseScale * (0.8 + relativeSizeFactor * 0.2) * (1 - Math.abs(localProgress) * 0.12);
 
-    // SCALE ADJUSTMENT: Upties asset has significantly less internal padding than others.
-    // We reduce its scale further (from 0.72 to 0.65) per user request to ensure perfect sizing.
     if (item.id === 'upties') {
       scale *= 0.65;
     }
 
-    // Dynamic glow peaks sharply when in direct focus
     glowIntensity = Math.pow(Math.max(0, 1 - Math.abs(localProgress)), 1.8);
 
-    // ORBIT: Tightened on mobile to ensure planets stay within viewport
-    const orbitRadius = globeContainerSize * (isMobile ? 0.42 : (isTablet ? 0.48 : 0.58));
+    // ORBIT: Widened slightly on mobile for better spacing
+    const orbitRadius = globeContainerSize * (isMobile ? 0.45 : (isTablet ? 0.48 : 0.58));
     const angleDeg = 180 + (localProgress * 55);
     const angleRad = (angleDeg * Math.PI) / 180;
 
@@ -122,8 +119,8 @@ const Planet = React.memo(({ item, isActive, progress, index, total, viewport, g
 
   if (opacity < 0.01) return null;
 
-  // Fluid planet base size (Scaled for visibility and viewport safety)
-  const planetSize = `${globeContainerSize * (isMobile ? 0.31 : (isTablet ? 0.33 : 0.35))}px`;
+  // Fluid planet base size (Boosted on mobile)
+  const planetSize = `${globeContainerSize * (isMobile ? 0.35 : (isTablet ? 0.33 : 0.35))}px`;
 
   const isUpties = item.id === 'upties';
 
@@ -151,34 +148,17 @@ const Planet = React.memo(({ item, isActive, progress, index, total, viewport, g
           imageRendering: isUpties ? 'high-quality' : 'auto'
         }} />
 
-        {/* ELITE 3D SHADER RIG (Upties-specific Multi-Point Lighting) */}
         {isUpties && (
           <>
-            {/* 1. MATTE BASE: Physical core fill */}
             <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'radial-gradient(circle at 30% 30%, #1a2a3a 0%, #000 100%)', pointerEvents: 'none' }} />
-
-            {/* 2. DIFFUSE SHADOW: Cinema-grade volumetric depth */}
             <div style={{ position: 'absolute', inset: 0, zIndex: 3, background: 'radial-gradient(circle at 80% 80%, rgba(0,0,0,0.95) 0%, transparent 75%)', mixBlendMode: 'multiply', pointerEvents: 'none' }} />
-
-            {/* 3. BROAD SPECULAR: Subsurface scatter glow */}
             <div style={{ position: 'absolute', inset: 0, zIndex: 4, background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 65%)', mixBlendMode: 'screen', pointerEvents: 'none' }} />
-
-            {/* 4. SHARP HOTSPOT: Mirror-like highlight */}
             <div style={{ position: 'absolute', inset: 0, zIndex: 5, background: 'radial-gradient(circle at 25% 25%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.1) 12%, transparent 40%)', mixBlendMode: 'plus-lighter', pointerEvents: 'none' }} />
-
-            {/* 5. ELITE RIM LIGHTING (Matching TBA Style) */}
             <div style={{
               position: 'absolute', inset: '-1px', zIndex: 6, borderRadius: '50%',
-              boxShadow: `
-                inset 10px 10px 25px rgba(255,255,255,0.28), 
-                inset -8px -8px 20px rgba(0,0,0,0.9),
-                inset 0 0 15px rgba(255,255,255,0.15)
-              `,
-              border: '2px solid rgba(255,255,255,0.18)',
-              pointerEvents: 'none'
+              boxShadow: `inset 10px 10px 25px rgba(255,255,255,0.28), inset -8px -8px 20px rgba(0,0,0,0.9), inset 0 0 15px rgba(255,255,255,0.15)`,
+              border: '2px solid rgba(255,255,255,0.18)', pointerEvents: 'none'
             }} />
-
-            {/* 6. ATMOSPHERIC SHEEN: Soft white glow on the left-side curve */}
             <div style={{
               position: 'absolute', inset: '-1px', zIndex: 7, borderRadius: '50%',
               background: 'radial-gradient(circle at 15% 40%, rgba(255,255,255,0.18) 0%, transparent 55%)',
@@ -188,7 +168,6 @@ const Planet = React.memo(({ item, isActive, progress, index, total, viewport, g
         )}
       </div>
 
-      {/* EXTERNAL ATMOSPHERIC GLOW */}
       <div style={{
         position: 'absolute', inset: '-30%',
         background: `radial-gradient(circle, ${item.color}${Math.floor(glowIntensity * 60)} 0%, transparent 75%)`,
@@ -296,9 +275,9 @@ const InitiativesSection = () => {
     };
   }, []);
 
-  // HERO GLOBE SIZING: Significantly larger to make them highly visible
+  // HERO GLOBE SIZING: Greatly expanded on mobile to utilize free space
   const globeContainerSize = isMobile
-    ? Math.min(viewport.width * 0.68, viewport.height * 0.54, 380)
+    ? Math.min(viewport.width * 0.85, viewport.height * 0.45, 420)
     : (isTablet ? Math.min(viewport.width * 0.52, viewport.height * 0.82, 640) : Math.min(viewport.width * 0.5, viewport.height * 0.85, 750));
 
   const activeIndex = Math.min(Math.round(progress * (initiatives.length - 1)), initiatives.length - 1);
@@ -324,17 +303,16 @@ const InitiativesSection = () => {
           zIndex: 10, pointerEvents: 'none'
         }} />
 
-
         <div style={{
           position: 'absolute',
-          top: isMobile ? '0.5vh' : '7.5vh',
+          top: isMobile ? '6vh' : '7.5vh',
           left: '0', width: '100%',
           textAlign: 'center',
           zIndex: 12,
           pointerEvents: 'none',
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          opacity: isMobile ? 1 : 1,
-          transform: isMobile ? `scale(${1 + progress * 0.5}) translateY(${progress * -40}px)` : 'none',
+          opacity: isMobile ? 1 - (progress * 0.5) : 1, // Cleaner fade out instead of scale
+          transform: isMobile ? `translateY(${progress * -20}px)` : 'none', // Removed scale() for cleaner view
           transition: isMobile ? 'none' : 'opacity 0.8s ease'
         }}>
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: isMobile ? '0' : '3vw' }}>
@@ -347,30 +325,12 @@ const InitiativesSection = () => {
             )}
 
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-              <h2 style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: 'clamp(2.8rem, 8vw, 7.5rem)',
-                fontWeight: 900,
-                textTransform: 'uppercase',
-                letterSpacing: 'clamp(10px, 2.5vw, 36px)',
-                margin: 0,
-                position: 'absolute',
-                top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                opacity: isMobile ? 0 : 0.38,
-                WebkitTextStroke: '1px white',
-                color: 'transparent',
-                textShadow: '0 0 18px rgba(255,255,255,0.25)',
-                whiteSpace: 'nowrap',
-                pointerEvents: 'none'
-              }}>
-                OUR INITIATIVES
-              </h2>
-
+              
+              {/* Removed the overlapping absolute <h2> here that caused the messy "cringe" shadow look */}
 
               <h1 style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: isMobile ? 'clamp(1.9rem, 6.2vw, 2.6rem)' : 'clamp(1.4rem, 4.2vw, 3.6rem)',
+                fontSize: isMobile ? 'clamp(1.9rem, 6.2vw, 2.6rem)' : 'clamp(2rem, 4.2vw, 3.6rem)',
                 fontWeight: 900,
                 textTransform: 'uppercase',
                 letterSpacing: isMobile ? '0.06em' : 'clamp(6px, 1.2vw, 20px)',
@@ -387,7 +347,6 @@ const InitiativesSection = () => {
               </h1>
             </div>
 
-
             {!isMobile && (
               <div className="hud-pulse" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', color: 'white', letterSpacing: '2px' }}>[ 0{activeIndex + 1} // 07 ]</span>
@@ -395,7 +354,6 @@ const InitiativesSection = () => {
               </div>
             )}
           </div>
-
 
           <div style={{
             height: '1px',
@@ -411,7 +369,6 @@ const InitiativesSection = () => {
 
         <StarFieldCanvas isMobile={isMobile} />
 
-
         <div style={{
           position: 'absolute', inset: 0, zIndex: 1,
           background: `radial-gradient(circle at ${isMobile ? '50% 45%' : '75% 50%'}, ${activeItem.color}22 0%, transparent 70%)`,
@@ -419,7 +376,8 @@ const InitiativesSection = () => {
           pointerEvents: 'none'
         }} />
 
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', zIndex: 5, padding: isMobile ? 'calc(8vh + 56px) 6% 18vh' : '5vh 7% 4vh', gap: isMobile ? '2vh' : '2vh' }}>
+        {/* Adjusted padding & gaps for mobile to fill space perfectly */}
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', zIndex: 5, padding: isMobile ? '16vh 5% 10vh' : '5vh 7% 4vh', gap: isMobile ? '4vh' : '2vh' }}>
           <div style={{
             display: isMobile ? 'flex' : 'grid',
             flexDirection: isMobile ? 'column' : undefined,
@@ -429,18 +387,18 @@ const InitiativesSection = () => {
             gap: isMobile ? '2vh' : '2vw',
             flex: 1
           }}>
+            
             {/* GLOBE CONTAINER */}
             <div style={{
               order: isMobile ? 2 : 2,
               position: 'relative',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: isMobile ? 'flex-end' : 'flex-end',
-              minHeight: isMobile ? '42vh' : (isTablet ? '60vh' : 'auto'),
-              maxHeight: isMobile ? '52vh' : 'none',
-              width: isMobile ? '100%' : '100%',
+              justifyContent: isMobile ? 'center' : 'flex-end', // Centered properly on mobile
+              minHeight: isMobile ? '38vh' : (isTablet ? '60vh' : 'auto'),
+              maxHeight: isMobile ? '48vh' : 'none',
+              width: '100%',
               overflow: 'visible',
-              paddingLeft: '0',
               zIndex: 5
             }}>
               <div style={{
@@ -448,8 +406,12 @@ const InitiativesSection = () => {
                 right: isMobile ? 'auto' : (isTablet ? '-45%' : '-26%'),
                 width: `${globeContainerSize}px`,
                 height: `${globeContainerSize}px`,
-                marginLeft: isMobile ? 'auto' : undefined,
-                transform: isMobile ? 'translateX(14%)' : undefined,
+                margin: isMobile ? '0 auto' : undefined,
+                
+                // === 👇 THE FIX IS APPLIED HERE 👇 ===
+                transform: isMobile ? 'translate(15vw, 5vh)' : undefined, 
+                // =====================================
+
                 pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}>
                 <img src={tiesverseLogo} alt="Hub" style={{ width: '55%', height: 'auto', filter: 'drop-shadow(0 0 50px rgba(255,255,255,0.1))', zIndex: 10, userSelect: 'none', transform: 'translateZ(0)' }} />
@@ -463,36 +425,36 @@ const InitiativesSection = () => {
             <div style={{
               order: isMobile ? 1 : 1,
               display: 'flex',
-              justifyContent: isMobile ? 'flex-start' : 'flex-start',
-              width: isMobile ? '100%' : '100%',
+              justifyContent: isMobile ? 'center' : 'flex-start',
+              width: '100%',
               zIndex: 10
             }}>
               <div key={activeItem.id} style={{
-                maxWidth: isMobile ? '520px' : (isTablet ? '620px' : '560px'),
+                maxWidth: isMobile ? '100%' : (isTablet ? '620px' : '560px'),
                 width: '100%',
-                padding: isMobile ? '12px 12px 14px' : '24px 26px',
+                padding: isMobile ? '24px 20px' : '24px 26px', // Beefed up mobile padding
                 background: 'linear-gradient(140deg, rgba(0,0,0,0.26) 0%, rgba(0,0,0,0.12) 100%)',
                 border: '1px solid rgba(255,255,255,0.035)',
                 boxShadow: '0 12px 30px rgba(0,0,0,0.28)',
                 backdropFilter: 'blur(6px)',
                 borderRadius: '16px'
               }}>
-                <div className="fade-in-up stagger-1" style={{ display: 'flex', alignItems: 'center', justifyContent: isMobile ? 'flex-start' : 'flex-start', gap: '12px', marginBottom: 'clamp(8px, 1.6vh, 16px)' }}>
+                <div className="fade-in-up stagger-1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '12px', marginBottom: 'clamp(8px, 1.6vh, 16px)' }}>
                   <div style={{ height: '2px', width: '35px', background: activeItem.color, transition: 'background 0.5s' }} />
                   <span style={{ color: activeItem.color, fontWeight: '900', letterSpacing: 'clamp(2px, 0.4vw, 5px)', fontSize: 'clamp(0.6rem, 0.8vw, 0.75rem)', transition: 'color 0.5s', fontFamily: "'Space Mono', monospace" }}>
                     PROJECT 0{activeIndex + 1}
                   </span>
                 </div>
 
-                <h2 className="fade-in-up stagger-2" style={{ color: 'white', fontSize: isMobile ? 'clamp(1.15rem, 4.4vw + 0.9vh, 1.75rem)' : (isTablet ? 'clamp(3.1rem, 6.2vw, 4.8rem)' : 'clamp(3.1rem, 4.6vw + 2vh, 5rem)'), fontFamily: "'Space Grotesk', sans-serif", margin: '0 0 6px 0', lineHeight: 0.92, textTransform: 'uppercase', fontWeight: 900, textShadow: '0 10px 30px rgba(0,0,0,0.5)', transition: 'color 0.4s ease', textAlign: isMobile ? 'left' : 'left' }}>
+                <h2 className="fade-in-up stagger-2" style={{ color: 'white', fontSize: isMobile ? 'clamp(1.8rem, 7vw, 2.4rem)' : (isTablet ? 'clamp(3.1rem, 6.2vw, 4.8rem)' : 'clamp(3.1rem, 4.6vw + 2vh, 5rem)'), fontFamily: "'Space Grotesk', sans-serif", margin: '0 0 8px 0', lineHeight: 0.92, textTransform: 'uppercase', fontWeight: 900, textShadow: '0 10px 30px rgba(0,0,0,0.5)', transition: 'color 0.4s ease', textAlign: 'left' }}>
                   {activeItem.name}
                 </h2>
 
-                <p className="fade-in-up stagger-3" style={{ color: '#b9b9b9', fontSize: isMobile ? 'clamp(0.7rem, 2.1vw, 0.92rem)' : (isTablet ? 'clamp(1.1rem, 1.8vw, 1.35rem)' : 'clamp(0.95rem, 0.6vw + 0.6vh, 1.2rem)'), lineHeight: 1.5, marginBottom: isMobile ? '12px' : '36px', fontFamily: "'Inter', sans-serif", fontWeight: 300, maxWidth: isMobile ? '100%' : 'none', margin: isMobile ? '0 0 12px' : '0 0 36px', textAlign: isMobile ? 'left' : 'left' }}>
+                <p className="fade-in-up stagger-3" style={{ color: '#b9b9b9', fontSize: isMobile ? 'clamp(0.95rem, 3.5vw, 1.1rem)' : (isTablet ? 'clamp(1.1rem, 1.8vw, 1.35rem)' : 'clamp(0.95rem, 0.6vw + 0.6vh, 1.2rem)'), lineHeight: 1.5, fontFamily: "'Inter', sans-serif", fontWeight: 300, maxWidth: isMobile ? '100%' : 'none', margin: isMobile ? '0 0 18px' : '0 0 36px', textAlign: 'left' }}>
                   {activeItem.desc}
                 </p>
 
-                <div className="fade-in-up stagger-4" style={{ textAlign: isMobile ? 'left' : 'left' }}>
+                <div className="fade-in-up stagger-4" style={{ textAlign: 'left' }}>
                   <a
                     href={activeItem.web}
                     target="_blank"
@@ -518,7 +480,7 @@ const InitiativesSection = () => {
           </div>
         </div>
 
-        {/* UI CONTROLS: Simplified and spaced to not crowd larger planets */}
+        {/* UI CONTROLS */}
         <div style={{ position: 'absolute', bottom: isMobile ? '1.5vh' : '3.5vh', left: '5%', right: '5%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', zIndex: 100, pointerEvents: 'none' }}>
           <button onClick={jumpToNext} style={{
             pointerEvents: 'auto', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: 'clamp(10px, 1vh, 15px) clamp(20px, 1.5vw, 28px)', cursor: 'pointer', fontSize: 'clamp(0.6rem, 0.4vw, 0.65rem)', fontWeight: 'bold', backdropFilter: 'blur(10px)', transition: 'all 0.3s ease', letterSpacing: '1.5px', fontFamily: "'Space Mono', monospace"
@@ -534,7 +496,7 @@ const InitiativesSection = () => {
           </div>
         </div>
 
-        {/* HORIZONTAL PROGRESS BAR (Restored) */}
+        {/* HORIZONTAL PROGRESS BAR */}
         <div style={{
           position: 'absolute', bottom: '0', left: '0', width: '100%', height: '2.5px',
           background: 'rgba(255,255,255,0.05)', zIndex: 120, pointerEvents: 'none'

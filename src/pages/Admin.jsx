@@ -266,7 +266,7 @@ const Admin = () => {
 
     // --- NEW CLOUDINARY UPLOAD FUNCTION ---
     const uploadImage = async (file) => {
-        if (UPLOAD_PRESET === "YOUR_PRESET_NAME") {
+        if (UPLOAD_PRESET === "TIESVERSE_UPLOAD") {
             throw new Error("Please set your Cloudinary UPLOAD_PRESET in the code first!");
         }
 
