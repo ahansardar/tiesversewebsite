@@ -9,6 +9,8 @@ import act9 from '../assets/act9.jpeg';
 import act10 from '../assets/act10.jpeg';
 import act11 from '../assets/act11.jpeg';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Article = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [insights, setInsights] = useState([]);
@@ -41,32 +43,89 @@ const Article = () => {
     return act1; // default
   };
 
+  // Helper function for fetch with timeout
+  const fetchWithTimeout = async (url, options = {}, timeout = 5000) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // 1. Fetch Display Limits
-        const sData = await getSettings();
-        if (sData && !sData.error) {
-          const pc = sData.find(s => s.key === 'article_display_limit_pc')?.value || 3;
-          const mob = sData.find(s => s.key === 'article_display_limit_mobile')?.value || 3;
-          setDisplayLimits({ pc: parseInt(pc), mobile: parseInt(mob) });
+        // 1. Fetch Display Limits with timeout
+        const sResponse = await fetchWithTimeout(`${API_URL}/api/settings`);
+        if (sResponse.ok) {
+          const sData = await sResponse.json();
+          if (sData && !sData.error) {
+            const pc = sData.find(s => s.key === 'article_display_limit_pc')?.value || 3;
+            const mob = sData.find(s => s.key === 'article_display_limit_mobile')?.value || 3;
+            setDisplayLimits({ pc: parseInt(pc), mobile: parseInt(mob) });
+          }
         }
 
-        // 2. Fetch articles - NEWEST FIRST
-        const artData = await getArticle();
-
-        if (artData && !artData.error && artData.length > 0) {
-          const formatted = artData.map(a => ({
-            ...a,
-            img: getArticleImage(a),
-            cat: a.category
-          }));
-          setInsights(formatted);
-          setActive(formatted[0]);
+        // 2. Fetch articles with timeout
+        const artResponse = await fetchWithTimeout(`${API_URL}/api/articles`);
+        if (artResponse.ok) {
+          const artData = await artResponse.json();
+          if (artData && !artData.error && artData.length > 0) {
+            const formatted = artData.map(a => ({
+              ...a,
+              img: getArticleImage(a),
+              cat: a.category
+            }));
+            setInsights(formatted);
+            setActive(formatted[0]);
+          }
         }
       } catch (err) {
-        console.error('Error fetching articles:', err);
+        console.error('Error fetching data:', err);
+        // Set dummy data for demo purposes
+        const dummyArticles = [
+          {
+            id: 1,
+            title: "The Future of AI in Research",
+            excerpt: "Exploring how artificial intelligence is transforming scientific discovery and analysis.",
+            category: "AI",
+            display_id: "01",
+            image_url: null,
+            redirect_url: null
+          },
+          {
+            id: 2,
+            title: "Quantum Computing Breakthroughs",
+            excerpt: "Latest developments in quantum technology and their implications for computing.",
+            category: "Quantum",
+            display_id: "02",
+            image_url: null,
+            redirect_url: null
+          },
+          {
+            id: 3,
+            title: "Sustainable Energy Solutions",
+            excerpt: "Innovative approaches to renewable energy and environmental sustainability.",
+            category: "Energy",
+            display_id: "03",
+            image_url: null,
+            redirect_url: null
+          }
+        ];
+        const formatted = dummyArticles.map(a => ({
+          ...a,
+          img: getArticleImage(a),
+          cat: a.category
+        }));
+        setInsights(formatted);
+        setActive(formatted[0]);
       }
       setLoading(false);
     };
@@ -88,8 +147,74 @@ const Article = () => {
 
   if (loading || !active) {
     return (
-      <section className="media-section" style={{ minHeight: '30vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000' }}>
-        <p style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '4px', fontSize: '12px', fontWeight: '800' }}>LOADING ANALYSIS...</p>
+      <section className="media-section" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ textAlign: 'center', zIndex: 2 }}>
+          <div style={{ 
+            color: 'rgba(255,255,255,0.5)', 
+            letterSpacing: '4px', 
+            fontSize: '14px', 
+            fontWeight: '800',
+            textTransform: 'uppercase',
+            marginBottom: '20px',
+            animation: 'pulse 2s infinite'
+          }}>
+            LOADING ANALYSIS...
+          </div>
+          <div style={{
+            width: '200px',
+            height: '2px',
+            background: 'linear-gradient(90deg, transparent, #FE7A00, transparent)',
+            borderRadius: '1px',
+            animation: 'loadingBar 1.5s ease-in-out infinite'
+          }}></div>
+        </div>
+        <style>{`
+          @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+          }
+          @keyframes loadingBar {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+          }
+        `}</style>
+        {/* Animated background elements */}
+        <div style={{
+          position: 'absolute',
+          top: '20%',
+          left: '10%',
+          width: '20px',
+          height: '20px',
+          background: 'rgba(254, 122, 0, 0.1)',
+          borderRadius: '50%',
+          animation: 'float 3s ease-in-out infinite'
+        }}></div>
+        <div style={{
+          position: 'absolute',
+          bottom: '30%',
+          right: '15%',
+          width: '15px',
+          height: '15px',
+          background: 'rgba(0, 255, 204, 0.1)',
+          borderRadius: '50%',
+          animation: 'float 4s ease-in-out infinite reverse'
+        }}></div>
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          right: '20%',
+          width: '10px',
+          height: '10px',
+          background: 'rgba(255, 107, 107, 0.1)',
+          borderRadius: '50%',
+          animation: 'float 5s ease-in-out infinite'
+        }}></div>
+        <style>{`
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+          }
+        `}</style>
       </section>
     );
   }

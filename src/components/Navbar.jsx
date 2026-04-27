@@ -89,16 +89,17 @@ const Navbar = () => {
     <>
       <style>{`
         .navbar {
-          position: fixed;
-          top: ${hasNotice && !isScrolled ? '45px' : '0px'};
-          left: 0; right: 0;
-          z-index: 10001;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          width: 100%;
-        }
+  position: sticky;
+  top: 0px; /* It will naturally stop at 0px when scrolled */
+  left: 0; right: 0;
+  z-index: 10001;
+  margin-bottom: -100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
 
         .navbar--transparent { background-color: transparent; padding: 24px 60px; }
 
