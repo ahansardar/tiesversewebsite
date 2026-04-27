@@ -243,7 +243,7 @@ const WebinarsPage = () => {
             <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
             <div className="wb-container">
-                <button className="wb-back-btn" onClick={() => navigate('/events')}>
+                <button className="wb-back-btn" onClick={() => window.history.back()}>
                     ← BACK
                 </button>
 

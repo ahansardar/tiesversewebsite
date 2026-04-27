@@ -84,6 +84,7 @@ const Admin = () => {
     const [cloudinaryPicker, setCloudinaryPicker] = useState({ open: false, images: [], loading: false });
     const [multiPickerSelected, setMultiPickerSelected] = useState([]);
     const [networkFileBatch, setNetworkFileBatch] = useState([]);
+    const [teamFileBatch, setTeamFileBatch] = useState([]);
 
     // EXTRACT PUBLIC_ID FROM CLOUDINARY URL
     const getPublicId = (url) => {
@@ -112,7 +113,7 @@ const Admin = () => {
 
     // SELECT IMAGE FROM PICKER
     const selectCloudinaryImage = (url) => {
-        if (activeTab === 'network') {
+        if (activeTab === 'network' || activeTab === 'team') {
             setMultiPickerSelected(prev =>
                 prev.includes(url) ? prev.filter(u => u !== url) : [...prev, url]
             );
@@ -134,6 +135,22 @@ const Admin = () => {
             if (!res?.error) count++;
         }
         showNotice(`${count} image${count !== 1 ? 's' : ''} added to Our Network!`);
+        setMultiPickerSelected([]);
+        setCloudinaryPicker({ open: false, images: [], loading: false });
+        fetchData();
+        setLoading(false);
+    };
+
+    // BATCH ADD SELECTED IMAGES (team tab)
+    const confirmTeamPickerSelection = async () => {
+        if (multiPickerSelected.length === 0) return;
+        setLoading(true);
+        let count = 0;
+        for (const url of multiPickerSelected) {
+            const res = await createMember({ image_url: url, name: 'New Member', role: '' });
+            if (!res?.error) count++;
+        }
+        showNotice(`${count} member${count !== 1 ? 's' : ''} added — edit each to set name & role.`);
         setMultiPickerSelected([]);
         setCloudinaryPicker({ open: false, images: [], loading: false });
         fetchData();
@@ -206,6 +223,7 @@ const Admin = () => {
         setSizeWarning({ open: false, file: null });
         setMobileMenuOpen(false);
         setNetworkFileBatch([]);
+        setTeamFileBatch([]);
         setMultiPickerSelected([]);
     };
 
@@ -296,9 +314,14 @@ const Admin = () => {
         const files = Array.from(e.target.files || []);
         if (files.length === 0) return;
 
-        // Multi-file batch path for network tab
+        // Multi-file batch path for network and team tabs
         if (activeTab === 'network' && files.length > 1) {
             setNetworkFileBatch(files);
+            setPreviewUrl(null);
+            return;
+        }
+        if (activeTab === 'team' && files.length > 1) {
+            setTeamFileBatch(files);
             setPreviewUrl(null);
             return;
         }
@@ -370,6 +393,25 @@ const Admin = () => {
 
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
+
+        // Batch file upload for team tab
+        if (activeTab === 'team' && teamFileBatch.length > 0) {
+            setLoading(true);
+            let count = 0;
+            for (const file of teamFileBatch) {
+                try {
+                    const url = await uploadImage(file);
+                    const res = await createMember({ image_url: url, name: 'New Member', role: '' });
+                    if (!res?.error) count++;
+                } catch { /* skip failed uploads */ }
+            }
+            showNotice(`${count} member${count !== 1 ? 's' : ''} added — edit each to set name & role.`);
+            setTeamFileBatch([]);
+            resetForm();
+            fetchData();
+            setLoading(false);
+            return;
+        }
 
         // Batch file upload for network tab
         if (activeTab === 'network' && networkFileBatch.length > 0) {
@@ -699,31 +741,46 @@ const Admin = () => {
         } else if (activeTab === 'team') {
             return (
                 <div className="form-grid">
-                    <div className="input-group"><label>Member Name</label><input type="text" name="name" value={formData.name || ''} onChange={handleInputChange} required /></div>
-                    <div className="input-group"><label>Designation / Role</label><input type="text" name="role" value={formData.role || ''} onChange={handleInputChange} required /></div>
+                    <div className="input-group" style={{ background: 'rgba(254,122,0,0.04)', border: '1px solid rgba(254,122,0,0.2)', borderRadius: '8px', padding: '12px 14px' }}>
+                        <p style={{ margin: 0, fontSize: '11px', color: 'var(--accent-orange)', fontWeight: '800', letterSpacing: '1px' }}>
+                            MULTI-SELECT ENABLED
+                        </p>
+                        <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#aaa', lineHeight: 1.6 }}>
+                            Cloudinary picker: click multiple images → confirm.<br />
+                            File upload: select multiple files at once.<br />
+                            <span style={{ color: '#666' }}>Batch adds members as "New Member" — edit each to set name & role.</span>
+                        </p>
+                    </div>
+                    <div className="input-group"><label>Member Name <span style={{ color: '#888', fontWeight: 400, fontSize: '11px' }}>(single upload only)</span></label><input type="text" name="name" value={formData.name || ''} onChange={handleInputChange} required={teamFileBatch.length === 0} disabled={teamFileBatch.length > 0} /></div>
+                    <div className="input-group"><label>Designation / Role <span style={{ color: '#888', fontWeight: 400, fontSize: '11px' }}>(single upload only)</span></label><input type="text" name="role" value={formData.role || ''} onChange={handleInputChange} required={teamFileBatch.length === 0} disabled={teamFileBatch.length > 0} /></div>
                     <div className="input-group">
-                        <label style={{ color: 'var(--accent-orange)' }}>PHOTO</label>
-
-                        {/* OPTION 1: Browse Cloudinary Library */}
-                        <div style={{ marginBottom: '12px' }}>
-                            <label style={{ fontSize: '11px', color: '#aaa', letterSpacing: '1px' }}>OPTION 1 — BROWSE CLOUDINARY LIBRARY</label>
-                            {previewUrl && (
-                                <div className="image-preview" style={{ width: '220px', aspectRatio: '4/5', marginTop: '10px', marginBottom: '10px' }}>
-                                    <img src={previewUrl} alt="prev" style={{ objectFit: 'contain' }} />
-                                </div>
-                            )}
-                            <button type="button" onClick={openCloudinaryPicker} style={{ width: '100%', padding: '12px', background: '#111', color: '#fff', border: '1px solid #333', fontFamily: 'inherit', fontWeight: '700', letterSpacing: '1px', fontSize: '11px', cursor: 'pointer', marginTop: '8px' }}>
-                                📂 BROWSE CLOUDINARY LIBRARY
-                            </button>
-                        </div>
-
-                        <div style={{ textAlign: 'center', color: '#555', fontSize: '11px', fontWeight: '800', margin: '10px 0', letterSpacing: '2px' }}>— OR —</div>
-
-                        {/* OPTION 2: Upload from desktop → auto uploads to Cloudinary */}
+                        <label style={{ color: 'var(--accent-orange)' }}>PHOTO — 4:5 RATIO</label>
                         <div className="upload-container">
-                            <label style={{ fontSize: '11px', color: '#aaa', letterSpacing: '1px' }}>OPTION 2 — UPLOAD FROM DESKTOP (auto-uploads to Cloudinary)</label>
-                            <input type="file" accept="image/*" onChange={handleFileChange} style={{ marginTop: '8px' }} />
-                            <p className="upload-hint">Please maintain 4:5 aspect ratio for best display.</p>
+                            {teamFileBatch.length > 0 ? (
+                                <div style={{ background: '#0a0a0a', border: '1px solid #333', borderRadius: '8px', padding: '16px', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div>
+                                        <p style={{ margin: 0, fontWeight: '800', fontSize: '13px', color: '#fff' }}>
+                                            {teamFileBatch.length} files selected
+                                        </p>
+                                        <p style={{ margin: '4px 0 0', fontSize: '10px', color: '#888', letterSpacing: '1px' }}>
+                                            Click "Publish to Site" to upload all
+                                        </p>
+                                    </div>
+                                    <button type="button" onClick={() => setTeamFileBatch([])} style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '10px', fontWeight: '700' }}>
+                                        CLEAR
+                                    </button>
+                                </div>
+                            ) : previewUrl ? (
+                                <div className="image-preview" style={{ width: '220px', aspectRatio: '4/5', marginBottom: '10px' }}>
+                                    <img src={previewUrl} alt="prev" style={{ objectFit: 'contain', width: '100%', height: '100%' }} />
+                                </div>
+                            ) : null}
+                            <button type="button" onClick={openCloudinaryPicker} style={{ width: '100%', padding: '12px', background: '#111', color: '#fff', border: '1px solid #333', fontFamily: 'inherit', fontWeight: '700', letterSpacing: '1px', fontSize: '11px', cursor: 'pointer', marginBottom: '8px' }}>
+                                📂 BROWSE CLOUDINARY LIBRARY (multi-select)
+                            </button>
+                            <div style={{ textAlign: 'center', color: '#555', fontSize: '10px', fontWeight: '800', margin: '6px 0', letterSpacing: '2px' }}>— OR UPLOAD NEW FILES —</div>
+                            <input type="file" accept="image/*" multiple onChange={handleFileChange} />
+                            <p className="upload-hint" style={{ marginTop: '6px' }}>Hold Ctrl / Cmd to select multiple files.</p>
                         </div>
                     </div>
                 </div>
@@ -1200,7 +1257,7 @@ const Admin = () => {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexShrink: 0 }}>
                             <div>
                                 <h3 style={{ margin: 0, letterSpacing: '2px', fontSize: '13px' }}>CLOUDINARY IMAGE LIBRARY</h3>
-                                {activeTab === 'network' && (
+                                {(activeTab === 'network' || activeTab === 'team') && (
                                     <p style={{ margin: '4px 0 0', fontSize: '10px', color: '#aaa', letterSpacing: '1px' }}>
                                         Click images to select — {multiPickerSelected.length} selected
                                     </p>
@@ -1260,6 +1317,17 @@ const Admin = () => {
                                     style={{ width: '100%', padding: '14px', background: 'var(--accent-orange)', color: '#000', border: 'none', fontFamily: 'inherit', fontWeight: '800', letterSpacing: '1px', fontSize: '12px', cursor: 'pointer', borderRadius: '6px' }}
                                 >
                                     {loading ? 'ADDING...' : `ADD ${multiPickerSelected.length} IMAGE${multiPickerSelected.length !== 1 ? 'S' : ''} TO OUR NETWORK`}
+                                </button>
+                            </div>
+                        )}
+                        {activeTab === 'team' && multiPickerSelected.length > 0 && (
+                            <div style={{ flexShrink: 0, paddingTop: '16px', borderTop: '1px solid #222', marginTop: '12px' }}>
+                                <button
+                                    onClick={confirmTeamPickerSelection}
+                                    disabled={loading}
+                                    style={{ width: '100%', padding: '14px', background: 'var(--accent-orange)', color: '#000', border: 'none', fontFamily: 'inherit', fontWeight: '800', letterSpacing: '1px', fontSize: '12px', cursor: 'pointer', borderRadius: '6px' }}
+                                >
+                                    {loading ? 'ADDING...' : `ADD ${multiPickerSelected.length} MEMBER${multiPickerSelected.length !== 1 ? 'S' : ''} TO TEAM`}
                                 </button>
                             </div>
                         )}

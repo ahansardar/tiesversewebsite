@@ -208,7 +208,7 @@ const PastGuests = () => {
             <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
             <div className="pg-container">
-                <button className="pg-back-btn" onClick={() => navigate('/events')}>
+                <button className="pg-back-btn" onClick={() => window.history.back()}>
                     ← BACK
                 </button>
 
