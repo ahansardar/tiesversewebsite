@@ -18,8 +18,25 @@ const guestsRoutes = require('./routes/guests');
 const networkRoutes = require('./routes/network');
 
 
-app.use(cors({origin : ['http://localhost:3000', 'http://localhost:5173', 'https://tiesverse.com']}));
-app.use(express.json());
+const allowedOrigins = [
+  'http://localhost:3000', 
+  'http://localhost:5173', 
+  'https://tiesverse.com',
+  process.env.FRONTEND_URL // <-- Add this!
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventsRoutes);
