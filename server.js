@@ -19,9 +19,9 @@ const networkRoutes = require('./routes/network');
 
 
 const allowedOrigins = [
-  'http://localhost:3000', 
-  'http://localhost:5173', 
-  'https://tiesverse.com',
+  // 'http://localhost:3000', 
+  // 'http://localhost:5173', 
+  // 'https://tiesverse.com',
   process.env.FRONTEND_URL // <-- Add this!
 ];
 
@@ -49,7 +49,7 @@ app.use('/api/cloudinary', cloudinaryRoutes);
 app.use('/api/guests', guestsRoutes);
 app.use('/api/network', networkRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
