@@ -1,0 +1,231 @@
+/
+├── backend
+│   ├── middleware
+│   │   └── auth.js
+│   ├── models
+│   │   ├── AdminUser.js
+│   │   ├── Article.js
+│   │   ├── Event.js
+│   │   ├── SiteSetting.js
+│   │   ├── TeamMember.js
+│   │   ├── Workshop.js
+│   │   └── YoutubeVideo.js
+│   ├── routes
+│   │   ├── articles.js
+│   │   ├── auth.js
+│   │   ├── cloudinary.js
+│   │   ├── events.js
+│   │   ├── guests.js
+│   │   ├── network.js
+│   │   ├── settings.js
+│   │   ├── team.js
+│   │   ├── workshops.js
+│   │   └── youtubeVideos.js
+│   ├── .dockerignore
+│   ├── .env
+│   ├── .gitattributes
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── directory_structure.txt
+│   ├── package-lock.json
+│   ├── package.json
+│   └── server.js
+├── public
+│   ├── .htaccess
+│   └── vite.svg
+├── src
+│   ├── assets
+│   │   ├── cards
+│   │   │   ├── f.png
+│   │   │   ├── fp.png
+│   │   │   ├── ie.png
+│   │   │   ├── nim.png
+│   │   │   ├── tbc.png
+│   │   │   ├── ti.png
+│   │   │   └── up.png
+│   │   ├── images
+│   │   │   ├── Aadi.mp4
+│   │   │   ├── Griid.mp4
+│   │   │   ├── black.jpeg
+│   │   │   ├── boy.jpg
+│   │   │   ├── cc.jpg
+│   │   │   ├── fav.png
+│   │   │   ├── ff.jpeg
+│   │   │   ├── hero-background.png
+│   │   │   ├── logo.png
+│   │   │   ├── pp.jpeg
+│   │   │   ├── ppf.png
+│   │   │   ├── ppi.jpeg
+│   │   │   └── vscode-window.png
+│   │   ├── logos
+│   │   │   ├── FINTIES LOGO.png
+│   │   │   ├── FOREIGN POLICY LOGO.png
+│   │   │   ├── INDIA ELECTIONS LOGO.png
+│   │   │   ├── NIMBLE LOGO.png
+│   │   │   ├── THE BHARAT AGE LOGO.png
+│   │   │   ├── TIESLOGO.png
+│   │   │   ├── TIESVERSE LOGO.png
+│   │   │   ├── UPTIES LOGO.png
+│   │   │   ├── amazon.png
+│   │   │   ├── asana.png
+│   │   │   ├── docker.png
+│   │   │   ├── doordash.png
+│   │   │   ├── github.png
+│   │   │   ├── ramp.png
+│   │   │   ├── retool.png
+│   │   │   └── vmware.png
+│   │   ├── planets
+│   │   │   ├── finties.png
+│   │   │   ├── fpi.png
+│   │   │   ├── indi.png
+│   │   │   ├── nimble.png
+│   │   │   ├── tba.png
+│   │   │   ├── ties.png
+│   │   │   ├── tiesverse.png
+│   │   │   └── upties.png
+│   │   ├── team
+│   │   │   ├── team_001.jpg
+│   │   │   ├── team_002.jpg
+│   │   │   ├── team_005.jpg
+│   │   │   ├── team_006.png
+│   │   │   ├── team_007.jpg
+│   │   │   ├── team_008.png
+│   │   │   ├── team_009.png
+│   │   │   ├── team_010.png
+│   │   │   ├── team_011.png
+│   │   │   ├── team_012.png
+│   │   │   └── team_013.jpg
+│   │   ├── team_heads
+│   │   │   ├── team_001.png
+│   │   │   ├── team_002.png
+│   │   │   ├── team_005.png
+│   │   │   ├── team_007.png
+│   │   │   ├── team_009.png
+│   │   │   ├── team_010.png
+│   │   │   ├── team_011.png
+│   │   │   ├── team_012.png
+│   │   │   └── team_013.png
+│   │   ├── Abhishek.jpg
+│   │   ├── Aditya.jpg
+│   │   ├── FINTIES LOGO.png
+│   │   ├── FOREIGN POLICY LOGO.png
+│   │   ├── IMG_0032.jpg
+│   │   ├── IMG_0043.jpg
+│   │   ├── IMG_0057.jpg
+│   │   ├── IMG_0390.jpg
+│   │   ├── INDIA ELECTIONS LOGO.png
+│   │   ├── NIMBLE LOGO.png
+│   │   ├── THE BHARAT AGE LOGO.png
+│   │   ├── TIESLOGO.png
+│   │   ├── TIESVERSE LOGO.png
+│   │   ├── UPTIES LOGO.png
+│   │   ├── act1.jpeg
+│   │   ├── act10.jpeg
+│   │   ├── act11.jpeg
+│   │   ├── act12.jpeg
+│   │   ├── act2.jpeg
+│   │   ├── act3.jpeg
+│   │   ├── act6.jpeg
+│   │   ├── act7.jpeg
+│   │   ├── act8.jpeg
+│   │   ├── act9.jpeg
+│   │   ├── aditi.jpg
+│   │   ├── asho.jpg
+│   │   ├── cursor.png
+│   │   ├── dcdd558b-c2b9-45ad-82a2-5946725105d4.jpg
+│   │   ├── engagement-comment.svg
+│   │   ├── engagement-like.svg
+│   │   ├── engagement-save.svg
+│   │   ├── engagement-share.svg
+│   │   ├── globe-animation.json
+│   │   ├── hardik.jpg
+│   │   ├── harsha.jpg
+│   │   ├── instagram.svg
+│   │   ├── jal.jpg
+│   │   ├── land.jpeg
+│   │   ├── landscape.jpeg
+│   │   ├── linkedin.svg
+│   │   ├── media.svg
+│   │   ├── mihir.jpg
+│   │   ├── nayo.jpg
+│   │   ├── nirjhar.jpg
+│   │   ├── nishu.jpg
+│   │   ├── parth.jpg
+│   │   ├── podcasts.svg
+│   │   ├── prithviraaj.jpg
+│   │   ├── pruthvi.jpg
+│   │   ├── reach-100m.svg
+│   │   ├── research.svg
+│   │   ├── ritika.jpg
+│   │   ├── smiti.jpg
+│   │   ├── tech.svg
+│   │   ├── trial.jpg
+│   │   ├── webinar.png
+│   │   ├── ws1.png
+│   │   ├── ws2.png
+│   │   ├── ws3.png
+│   │   ├── ws4.png
+│   │   ├── youtube.svg
+│   │   ├── yt1.jpg
+│   │   ├── yt2.jpg
+│   │   ├── yt3.jpg
+│   │   ├── yt4.jpg
+│   │   ├── yt5.jpg
+│   │   └── yt6.jpg
+│   ├── components
+│   │   ├── AnnouncementBanner.css
+│   │   ├── AnnouncementBanner.jsx
+│   │   ├── ContentButtons.jsx
+│   │   ├── CustomCursor.jsx
+│   │   ├── Footer.jsx
+│   │   ├── HeroSection.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── Preloader.jsx
+│   │   ├── ProtectedRoute.jsx
+│   │   ├── SolarSystem.jsx
+│   │   └── VSCodePreview.jsx
+│   ├── pages
+│   │   ├── About.jsx
+│   │   ├── Admin.jsx
+│   │   ├── Article.jsx
+│   │   ├── Contact.jsx
+│   │   ├── Context.jsx
+│   │   ├── Events.jsx
+│   │   ├── Home.jsx
+│   │   ├── Login.jsx
+│   │   ├── NotFound.jsx
+│   │   ├── Note.jsx
+│   │   ├── PastGuests.jsx
+│   │   ├── Research.jsx
+│   │   ├── Team.jsx
+│   │   ├── Upcoming.jsx
+│   │   ├── WebinarsPage.jsx
+│   │   └── Works.jsx
+│   ├── styles
+│   │   ├── About.css
+│   │   ├── Admin.css
+│   │   ├── Articles.css
+│   │   ├── Contact.css
+│   │   ├── ContentButtons.css
+│   │   ├── Events.css
+│   │   ├── HeroSection.css
+│   │   ├── PlaceholderPage.css
+│   │   ├── SolarSystem.css
+│   │   ├── VSCodePreview.css
+│   │   └── global.css
+│   ├── App.jsx
+│   ├── apiClient.js
+│   └── main.jsx
+├── .env
+├── .gitattributes
+├── .gitignore
+├── README.md
+├── eslint.config.js
+├── generate_tree.py
+├── index.html
+├── package-lock.json
+├── package.json
+├── pnpm-lock.yaml
+├── vite.config.js
+├── wired-flat-742-code-hover-pinch.json
+└── wired-lineal-27-globe-loop-rotate.json
