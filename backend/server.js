@@ -19,7 +19,7 @@ app.use(express.json());
 const allowedOrigins = [
   'http://localhost:3000', // Un-commented so your local testing works!
   'http://localhost:5173', // Vite local testing
-  'https://tiesverse.com'  // Your future live domain
+  'https://tiesverse.com'  // live domain
 ];
 
 if (process.env.FRONTEND_URL) {
