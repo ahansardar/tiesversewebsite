@@ -639,6 +639,7 @@ const Events = () => {
                         {/* <h2 className="block-title">OUR NETWORK</h2> */}
                     </header>
 
+                    {/* Commented the Our network panel */}
                     {/* — NETWORK IMAGE STRIP — */}
                     {/* {data.networkImages.length > 0 && (
                         <div className="network-strip-wrap">
