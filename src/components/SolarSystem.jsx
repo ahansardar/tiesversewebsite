@@ -11,7 +11,7 @@ import tbaLogo from '../assets/planets/tba.png';
 import fintiesLogo from '../assets/planets/finties.png';
 import indiLogo from '../assets/planets/indi.png';
 import fpiLogo from '../assets/planets/fpi.png';
-import uptiesLogo from '../assets/planets/upties-yo3YAmjB.png';
+import uptiesLogo from '../assets/planets/upties.png';
 import nimbleLogo from '../assets/planets/nimble.png';
 
 // ============================================================
