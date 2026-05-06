@@ -73,7 +73,16 @@ const Navbar = () => {
 
     const el = document.getElementById(id)
     if (el) {
-      const noticeHeight = hasNotice && !isScrolled ? 40 : 0
+      //navbar height adjustment done
+      const noticeHeight = hasNotice && !isScrolled
+        ? (() => {
+            const noticeEl = document.querySelector('.global-notice-bar')
+            if (!noticeEl) return 0
+
+            const noticeMarginBottom = parseFloat(window.getComputedStyle(noticeEl).marginBottom || '0')
+            return (noticeEl.offsetHeight || 0) + noticeMarginBottom
+          })()
+        : 0
       const navHeight = isScrolled ? 70 : 90
       const totalOffset = noticeHeight + navHeight
 
