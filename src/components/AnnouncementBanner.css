@@ -24,7 +24,6 @@
     align-items: center;
     gap: 12px;
     flex: 1;
-    min-width: 0;
     overflow: hidden;
 }
 
@@ -52,16 +51,10 @@
     color: #fff;
 }
 
-.banner-separator,
-.banner-meta {
-    display: inline;
-}
-
 .banner-right {
     display: flex;
     align-items: center;
     gap: 15px;
-    flex-shrink: 0;
 }
 
 .banner-cta {
@@ -76,7 +69,6 @@
     letter-spacing: 0.5px;
     display: inline-flex;
     align-items: center;
-    white-space: nowrap;
 }
 
 .banner-cta:hover {
@@ -130,104 +122,18 @@
 
 @media (max-width: 768px) {
     .announcement-banner-wrapper {
-        height: 54px;
-        min-height: 54px;
-        padding: 0;
-        margin-bottom: -6px;
-        z-index: 10020;
+        height: 55px;
     }
 
     .banner-content {
-        width: calc(100% - 10px);
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        position: relative;
-        padding-right: 22px;
+        gap: 10px;
     }
 
     .banner-tag {
         display: none;
     }
 
-    .banner-left {
-        align-items: center;
-        overflow: hidden;
-        flex: 1 1 auto;
-    }
-
     .banner-text {
         font-size: 10px;
-        line-height: 1.2;
-        letter-spacing: 0.25px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-        width: 100%;
-        margin: 0;
-    }
-
-    .banner-separator,
-    .banner-meta {
-        display: none;
-    }
-
-    .banner-right {
-        gap: 0;
-        justify-content: flex-end;
-    }
-
-    .banner-cta {
-        min-height: 28px;
-        padding: 0 10px;
-        font-size: 7px;
-        border-radius: 999px;
-        letter-spacing: 0.55px;
-    }
-
-    .banner-close {
-        position: absolute;
-        top: 50%;
-        right: 0;
-        width: 18px;
-        height: 18px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        transform: translateY(-50%);
-    }
-}
-
-@media (max-width: 480px) {
-    .announcement-banner-wrapper {
-        height: 50px;
-        min-height: 50px;
-        margin-bottom: -8px;
-    }
-
-    .banner-content {
-        width: calc(100% - 6px);
-        gap: 5px;
-        padding-right: 18px;
-    }
-
-    .banner-text {
-        font-size: 8.5px;
-    }
-
-    .banner-cta {
-        min-height: 26px;
-        padding: 0 8px;
-        font-size: 6.8px;
-        letter-spacing: 0.4px;
-    }
-
-    .banner-close {
-        width: 16px;
-        height: 16px;
-        font-size: 9px;
     }
 }
