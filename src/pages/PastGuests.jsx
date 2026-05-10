@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getGuests } from '../apiClient';
 
 const CSS = `
@@ -186,6 +186,7 @@ const PastGuests = () => {
     const [guests, setGuests] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         getGuests()
@@ -193,6 +194,15 @@ const PastGuests = () => {
             .catch(() => setGuests([]))
             .finally(() => setLoading(false));
     }, []);
+
+    useEffect(() => {
+        if (loading || !location.hash) return;
+        const id = location.hash.slice(1);
+        const el = document.getElementById(id);
+        if (el) {
+            setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+        }
+    }, [loading, location.hash]);
 
     if (loading) {
         return (
@@ -229,6 +239,7 @@ const PastGuests = () => {
                     guests.map((guest, idx) => (
                         <div
                             key={guest.id}
+                            id={`guest-${guest.id}`}
                             className={`pg-guest-entry${idx % 2 !== 0 ? ' reversed' : ''}`}
                         >
                             <div className="pg-guest-img-wrap">

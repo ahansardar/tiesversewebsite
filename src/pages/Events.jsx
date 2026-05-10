@@ -701,7 +701,7 @@ const Events = () => {
                                     {data.guests.length > 0 ? (
                                         <div className="guest-mosaic">
                                             {data.guests.slice(0, 6).map((g) => (
-                                                <div key={g.id} className="guest-tile" onClick={() => navigate('/past-guests')}>
+                                                <div key={g.id} className="guest-tile" onClick={() => navigate(`/past-guests#guest-${g.id}`)}>
                                                     <img src={g.image_url} alt={g.name} loading="lazy" />
                                                     <div className="guest-tile-overlay">
                                                         <div className="guest-tile-name">{g.name}</div>
